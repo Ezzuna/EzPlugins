@@ -79,6 +79,10 @@ public class ButterflyPlugin extends Plugin {
         List<Widget> filledJars = Inventory.search().withAction("Release").withName(config.butterfly().getName()).result();
         Optional<Widget> emptyJar = Inventory.search().withName("Butterfly jar").first();
 
+        if(filledJars.isEmpty()){
+             filledJars = Inventory.search().withAction("Release").withName(config.butterfly().getAlt_name()).result();
+        }
+
         checkRunEnergy();
 
         if (!filledJars.isEmpty()) {

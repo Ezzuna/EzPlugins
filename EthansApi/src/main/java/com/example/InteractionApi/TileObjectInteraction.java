@@ -42,4 +42,22 @@ public class TileObjectInteraction {
         ObjectPackets.queueObjectAction(tileObject, false, actions);
         return true;
     }
+
+    public static boolean interactNearest(int id, String... actions) {
+        return TileObjects.search().withId(id).nearestToPlayer().flatMap(tileObject ->
+        {
+            MousePackets.queueClickPacket();
+            ObjectPackets.queueObjectAction(tileObject, false, actions);
+            return Optional.of(true);
+        }).orElse(false);
+    }
+
+    public static boolean interactNearest(String name, String... actions) {
+        return TileObjects.search().withName(name).nearestToPlayer().flatMap(tileObject ->
+        {
+            MousePackets.queueClickPacket();
+            ObjectPackets.queueObjectAction(tileObject, false, actions);
+            return Optional.of(true);
+        }).orElse(false);
+    }
 }

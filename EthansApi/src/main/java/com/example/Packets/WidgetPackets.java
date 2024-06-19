@@ -53,6 +53,7 @@ public class WidgetPackets {
             System.out.println("call to queueWidgetAction with null widget");
             return;
         }
+
         List<String> actions = Arrays.stream(widget.getActions()).collect(Collectors.toList());
         for (int i = 0; i < actions.size(); i++) {
             if (actions.get(i) == null)

@@ -107,8 +107,12 @@ public class AutoTrapperPlugin extends Plugin {
         if (client.getGameState() != GameState.LOGGED_IN || !started) {
             return;
         }
-        if (ticksNotInRegion >= 20) {
+        if (ticksNotInRegion >= 20 && config.salamander() != Salamander.TECU_SALAMANDER) {
             EthanApiPlugin.sendClientMessage("Not in correct region, stopping plugin");
+            EthanApiPlugin.stopPlugin(this);
+        }
+        else if(ticksNotInRegion >= 60 && config.salamander() == Salamander.TECU_SALAMANDER) {
+            EthanApiPlugin.sendClientMessage("Not in correct region, stopping plugin tecu mode.");
             EthanApiPlugin.stopPlugin(this);
         }
         if (timeout > 0) {

@@ -7,7 +7,8 @@ public enum Salamander {
     SWAMP_LIZARD("Swamp lizard", 14133),
     ORANGE_SALAMANDER("Orange salamander", 13616),
     RED_SALAMANDER("Red salamander", 9778),
-    BLACK_SALAMANDER("Black salamander", 13113);
+    BLACK_SALAMANDER("Black salamander", 13113),
+    TECU_SALAMANDER("Immature tecu salamander", 5936);
     @Getter
     private String name;
     @Getter
