@@ -14,7 +14,7 @@ allprojects {
         jcenter()
     }
 
-    def runeLiteVersion = '1.10.32.1'
+    def runeLiteVersion = '1.10.32'
 
     plugins.withType(JavaPlugin) {
         dependencies {
@@ -45,7 +45,6 @@ dependencies {
     implementation project(path: ':AutoRifts')
     implementation project(path: ':AutoTele')
     implementation project(path: ':CalvarionHelper')
-    implementation project(path: ':CannonReloader')
     implementation project(path: ':E3T4G')
     implementation project(path: ':EthansApi')
     implementation project(path: ':ChinBreakHandler')
@@ -74,41 +73,7 @@ dependencies {
     implementation project(path: ':DropParty')
     implementation project(path: ':BetterProfiles')
     implementation project(path: ':PathingTesting')
-    implementation project(path: ':PiggyAutoCombat')
-    implementation project(path: ':CluePuzzleSolver')
-    implementation project(path: ':BJTest')
-    implementation project(path: ':BobTheBaller')
-    implementation project(path: ':BobTheBlower')
-    implementation project(path: ':BobTheBuilder')
-    implementation project(path: ':BobTheChef')
-    implementation project(path: ':BobTheCutter')
-    implementation project(path: ':BobTheFarmer')
-    implementation project(path: ':BobTheHunter')
-    implementation project(path: ':BobTheLazyNMZ')
-    implementation project(path: ':BobTheThief')
-    implementation project(path: ':BobTheWizard')
-    implementation project(path: ':EzAshMiner')
-    implementation project(path: ':EzBarbFish')
-    implementation project(path: ':EzEdgeSmelter')
-    implementation project(path: ':EzFalconry')
-    implementation project(path: ':EzGarbageCollector')
-    implementation project(path: ':EzGemMineBot')
-    implementation project(path: ':EzHerbi')
-    implementation project(path: ':EzHerbs')
-    implementation project(path: ':EzMlmSlacker')
-    implementation project(path: ':EzShopper')
-    implementation project(path: ':EzSplasher')
-    implementation project(path: ':EzMTA')
-    implementation project(path: ':EzNaguaSlayer')
-    implementation project(path: ':EzStall_stealer')
-    implementation project(path: ':EzStarReminer')
-    implementation project(path: ':EzWintertodt')
-    implementation project(path: ':EzBankingUtility')
-    implementation project(path: ':EzPitfallHunter')
-    implementation project(path: ':EzMoonlightMothCollector')
-    implementation project(path: ':EzSlayerAssistant')
-    implementation project(path: ':EzScurrius')
-    implementation project(path: ':EzApi')
+    implementation project(path: ':LeftClickBlackJack')
     implementation 'io.reactivex.rxjava3:rxjava:3.1.6'
 }
 
@@ -124,7 +89,7 @@ sourceSets {
 }
 
 group = 'com.piggyplugins'
-version = '1.2.4'
+version = '1.2.6'
 sourceCompatibility = "11"
 
 task FatJar(type: Jar) {
