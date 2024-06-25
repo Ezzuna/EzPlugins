@@ -106,7 +106,7 @@ public interface EzBankingUtilityConfig extends Config {
     @ConfigItem(
             keyName = "DoMeatSack",
             name = "Empty Meat Sack",
-            description = "Works on all sacks. (⸝⸝⸝• ω •⸝⸝⸝) ♡",
+            description = "Works on all sacks.",
             position = 1,
             section = hunterItemsSection
     )

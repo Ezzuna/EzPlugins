@@ -14,7 +14,8 @@ allprojects {
         jcenter()
     }
 
-    def runeLiteVersion = '1.10.32'
+    //def runeLiteVersion = '1.10.33-SNAPSHOT'
+    def runeLiteVersion = 'latest.release'
 
     plugins.withType(JavaPlugin) {
         dependencies {
@@ -62,6 +63,7 @@ dependencies {
     implementation project(path: ':PrayerFlicker')
     implementation project(path: ':PrayAgainstPlayer')
     implementation project(path: ':RooftopAgility')
+    implementation project(path: ':CluePuzzleSolver')
     implementation project(path: ':RunEnabler')
     implementation project(path: ':ShiftClickWalker')
     implementation project(path: ':SixHourLog')
@@ -89,7 +91,7 @@ sourceSets {
 }
 
 group = 'com.piggyplugins'
-version = '1.2.6'
+version = '1.2.7'
 sourceCompatibility = "11"
 
 task FatJar(type: Jar) {
