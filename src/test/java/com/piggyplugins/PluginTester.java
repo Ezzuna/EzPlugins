@@ -1,6 +1,7 @@
 package com.piggyplugins;
 
 import com.Ezzuneware.BJTest.BJTestPlugin;
+import com.Ezzuneware.EzApi.EzApi;
 import com.Ezzuneware.EzAshMiner.EzAshMinerPlugin;
 import com.Ezzuneware.EzBankingUtility.EzBankingUtilityPlugin;
 import com.Ezzuneware.EzBarbFish.EzBarbFishPlugin;
@@ -17,6 +18,7 @@ import com.Ezzuneware.EzNaguaSlayer.EzNaguaSlayerPlugin;
 import com.Ezzuneware.EzPitfallHunter.EzPitfallHunterPlugin;
 import com.Ezzuneware.EzScurrius.EzScurriusPlugin;
 import com.Ezzuneware.EzShopper.EzShopperPlugin;
+import com.Ezzuneware.EzSlayerAssistant.EzSlayerAssistantPlugin;
 import com.Ezzuneware.EzSplasher.EzSplasherPlugin;
 import com.Ezzuneware.EzStall_stealer.EzStall_stealerPlugin;
 import com.Ezzuneware.EzStarReminer.EzStarReminerPlugin;
@@ -83,7 +85,7 @@ import net.runelite.client.plugins.betterprofiles.BetterProfilesPlugin;
 
 public class PluginTester {
     public static void main(String[] args) throws Exception {
-        ExternalPluginManager.loadBuiltin(EthanApiPlugin.class, PacketUtilsPlugin.class,
+        ExternalPluginManager.loadBuiltin(EthanApiPlugin.class, EzApi.class, PacketUtilsPlugin.class,
                 PiggyUtilsPlugin.class// Don't remove these
         /* Add your plugins in this method when running from the IDE.
            Make sure to include them as a dependency in the build.gradle via `testImplementation` */,
@@ -162,8 +164,8 @@ public class PluginTester {
                 EzPitfallHunterPlugin.class,
                 EzMoonlightMothCollectorPlugin.class,
                 EzMTAPlugin.class,
-                EzScurriusPlugin.class
-
+                EzScurriusPlugin.class,
+                EzSlayerAssistantPlugin.class
                 );
         RuneLite.main(args);
     }

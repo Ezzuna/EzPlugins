@@ -6,5 +6,6 @@ public enum State {
     chasing,
     looting,
     resettingAggro,
-    teleing
+    teleing,
+    eating
 }

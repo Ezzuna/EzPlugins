@@ -5,6 +5,7 @@ public enum State {
     hopping,
     shopping,
     travelling,
-    prehop
+    prehop,
+    using
 }
 

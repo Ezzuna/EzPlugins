@@ -1,9 +1,11 @@
 package com.Ezzuneware.EzPitfallHunter;
 
 
+import com.Ezzuneware.EzApi.Combat.EzInventory;
 import com.example.EthanApiPlugin.Collections.Inventory;
 import com.example.EthanApiPlugin.Collections.NPCs;
 import com.example.EthanApiPlugin.Collections.TileObjects;
+import com.example.EthanApiPlugin.Collections.Widgets;
 import com.example.EthanApiPlugin.EthanApiPlugin;
 import com.example.InteractionApi.InventoryInteraction;
 import com.example.InteractionApi.NPCInteraction;
@@ -30,16 +32,15 @@ import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.ui.overlay.OverlayManager;
 import net.runelite.client.util.HotkeyListener;
 import org.apache.commons.lang3.RandomUtils;
-import org.lwjgl.system.linux.Stat;
 
 import java.util.Optional;
 import java.util.Set;
 
 @PluginDescriptor(
-        name = "EzPitfallHunter",
+        name = "<html><font color=\"#00c27e\">[Ez]</font>EzMoonlightAntlerHunter</html>",
         description = "",
         enabledByDefault = false,
-        tags = {"eco", "plugin"}
+        tags = {"eco", "plugin","Ez"}
 )
 @Slf4j
 public class EzPitfallHunterPlugin extends Plugin {
@@ -81,6 +82,7 @@ public class EzPitfallHunterPlugin extends Plugin {
     public int BoostedHitpoints;
     public int minHitpoints = 17;
     private final int ROOTS_ID = 51746;
+    private int chisel_widget_id = 17694734;
     @Getter
     private State state = State.idle;
 
@@ -153,9 +155,8 @@ public class EzPitfallHunterPlugin extends Plugin {
         state = DiscoverState();
 
         if (state == State.too_weak) {
-            Optional<Widget> food = Inventory.search().matchesWildCardNoCase(config.foodName()).first();
-            if (food.isPresent()) {
-                InventoryInteraction.useItem(food.get(), "Eat");
+
+            if (EzInventory.EatFirstFoodInCSS(config.foodList())) {
                 setTimeout();
                 return;
             } else {
@@ -213,7 +214,16 @@ public class EzPitfallHunterPlugin extends Plugin {
     }
 
     private State DiscoverState() {
+        if (holdingNPC == null) {
+            if (BoostedHitpoints <= config.eatAt())
+                return State.too_weak;
+        }
 
+        if (state == State.gatheringRoots && logCount < 3)
+            return state;
+        if (logCount == 0) {
+            return State.gatheringRoots;
+        }
         if (idleTicks > 8) {
             state = State.idle;
         }
@@ -221,15 +231,9 @@ public class EzPitfallHunterPlugin extends Plugin {
             return state;
         }
 
+
         if (CheckForLoot()) {
             return State.cleaning;
-        }
-
-        if (holdingNPC == null && logCount < 3) {
-
-            return State.gatheringRoots;
-
-
         }
 
 
@@ -239,25 +243,22 @@ public class EzPitfallHunterPlugin extends Plugin {
 
         Optional<TileObject> spikePit = TileObjects.search().withName("Spiked pit").first();
 
-        if (holdingNPC == null) {
-            if (BoostedHitpoints <= minHitpoints)
-                return State.too_weak;
-            else
-                return State.tagging;
-        }
-
-        if (spikePit.isPresent()) {
-            var x = spikePit.get().getWorldLocation();
-            return State.hopping;
-        }
 
 
         Optional<TileObject> lootPit = TileObjects.search().withName("Collapsed trap").first();
         if (lootPit.isPresent())
             return State.cleaning;
+        if (NPCs.search().interactingWithLocal().first().isPresent()) {
+            if (spikePit.isPresent()) {
+                return State.hopping;
+
+            } else
+                return State.building;
+
+        } else
+            return State.tagging;
 
 
-        return State.idle;
     }
 
     private Boolean CheckForLoot() {
@@ -291,13 +292,21 @@ public class EzPitfallHunterPlugin extends Plugin {
         logCount = Inventory.getItemAmount("Logs");
         antlerCount = Inventory.getItemAmount("Moonlight antelope antler");
 
+        Optional<Widget> antlerPrompt = Widgets.search().withId(chisel_widget_id).first();
+        if (antlerPrompt.isPresent()) {
+            MousePackets.queueClickPacket();
+            WidgetPackets.queueResumePause(chisel_widget_id, antlerCount);
+            setTimeout();
+            return;
+        }
+
         if (state == State.chiseling)
             return;
 
         Optional<Widget> antler = Inventory.search().withName("Moonlight antelope antler").first();
         Optional<Widget> chisel = Inventory.search().withName("Chisel").first();
 
-        if (antler.isPresent() && chisel.isPresent()) {
+        if (antler.isPresent() && chisel.isPresent() && NPCs.search().interactingWithLocal().first().isEmpty()) {
             MousePackets.queueClickPacket();
             WidgetPackets.queueWidgetOnWidget(antler.get(), chisel.get());
             state = State.chiseling;

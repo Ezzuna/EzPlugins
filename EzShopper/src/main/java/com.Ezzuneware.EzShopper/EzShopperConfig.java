@@ -103,7 +103,7 @@ public interface EzShopperConfig extends Config {
         return "Lucky charms";
     }
 
-        @ConfigItem(
+    @ConfigItem(
             keyName = "quantityToTradeTill",
             name = "Stock Quantity to trade till",
             description = "We will buy/sell until the stock is at x amount. If you wanted to sell 20 per world, or buy 20 per world, you'd enter 20. Genius.",
@@ -113,5 +113,39 @@ public interface EzShopperConfig extends Config {
     default int quantityToTradeTill() {
         return 1;
     }
+
+    @ConfigItem(
+            keyName = "useOnItem",
+            name = "Use item on inventory item",
+            description = "When invent is full, will use the selected item in inventory on another item. I built this for using Butterfly jars on Huntsman's kit to prep for EzMoonlightMothCatcher, but I'm sure there are other uses.",
+            position = 4,
+            section = ezShopperConfig
+    )
+    default boolean useOnItem() {
+        return false;
+    }
+
+    @ConfigItem(
+            keyName = "useOnItemName",
+            name = "Use item on inventory item name",
+            description = "Name of the item to be used with the selected item if above is true. Accepts wildcards *",
+            position = 5,
+            section = ezShopperConfig
+    )
+    default String useOnItemName() {
+        return "";
+    }
+
+    @ConfigItem(
+            keyName = "spamMode",
+            name = "Spam mode",
+            description = "Will send 4 to 5 clicks per tick (buy/sell > 50 only)",
+            position = 4,
+            section = ezShopperConfig
+    )
+    default boolean spamMode() {
+        return false;
+    }
+
 
 }

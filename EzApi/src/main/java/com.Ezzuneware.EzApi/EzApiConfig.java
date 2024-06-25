@@ -1,10 +1,10 @@
-package com.Ezzuneware.EzPitfallHunter;
+package com.Ezzuneware.EzApi;
 
 
 import net.runelite.client.config.*;
 
-@ConfigGroup("EzPitfallHunterConfig")
-public interface EzPitfallHunterConfig extends Config {
+@ConfigGroup("EzApiConfig")
+public interface EzApiConfig extends Config {
     @ConfigItem(
             keyName = "Toggle",
             name = "Toggle",
@@ -15,33 +15,10 @@ public interface EzPitfallHunterConfig extends Config {
         return Keybind.NOT_SET;
     }
 
-    @ConfigItem(
-            keyName = "foodName",
-            name = "Food Name",
-            description = "",
-            position = 1
-    )
-    default String foodList() {
-        return "";
-    }
-
-    @Range(
-            max = 98
-    )
-    @ConfigItem(
-            keyName = "eatAt",
-            name = "Eat threshold",
-            description = "Hp value to eat at",
-            position = 2
-    )
-    default int eatAt() {
-        return 20;
-    }
-
     @ConfigSection(
             name = "Game Tick Configuration",
             description = "Configure how to handles game tick delays, 1 game tick equates to roughly 600ms",
-            position = 2,
+            position = 1,
             closedByDefault = true
     )
     String delayTickConfig = "delayTickConfig";

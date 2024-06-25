@@ -1,11 +1,14 @@
 package com.Ezzuneware.EzScurrius;
 
-
-import com.example.EthanApiPlugin.Collections.NPCs;
-import com.example.EthanApiPlugin.Collections.Widgets;
+import com.Ezzuneware.EzApi.EzApi;
+import com.Ezzuneware.EzApi.Combat.*;
+import com.Ezzuneware.EzApi.Looting.ezLooter;
+import com.Ezzuneware.EzApi.Utility.EzHelperClass;
+import com.example.EthanApiPlugin.Collections.*;
 import com.example.EthanApiPlugin.EthanApiPlugin;
 import com.example.InteractionApi.InventoryInteraction;
 import com.example.InteractionApi.NPCInteraction;
+import com.example.InteractionApi.TileObjectInteraction;
 import com.example.Packets.*;
 import com.google.inject.Inject;
 import com.google.inject.Provides;
@@ -14,16 +17,15 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.*;
 import net.runelite.api.coords.WorldPoint;
-import net.runelite.api.events.GameTick;
-import net.runelite.api.events.GraphicsObjectCreated;
-import net.runelite.api.events.NpcSpawned;
-import net.runelite.api.events.ProjectileMoved;
+import net.runelite.api.events.*;
 import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
+import net.runelite.client.events.NpcLootReceived;
 import net.runelite.client.game.ItemManager;
+import net.runelite.client.game.ItemStack;
 import net.runelite.client.game.NpcUtil;
 import net.runelite.client.input.KeyManager;
 import net.runelite.client.plugins.Plugin;
@@ -35,13 +37,14 @@ import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.*;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @PluginDescriptor(
-        name = "EzScurrius",
+        name = "<html><font color=\"#00c27e\">[Ez]</font>EzScurrius</html>",
         description = "",
         enabledByDefault = false,
-        tags = {"eco", "plugin"}
+        tags = {"eco", "plugin", "ez"}
 )
 @Slf4j
 public class EzScurriusPlugin extends Plugin {
@@ -87,6 +90,8 @@ public class EzScurriusPlugin extends Plugin {
     private int ratTimer = 0;
     private Boolean spawnChecked = false;
     List<NPC> rats = new ArrayList<NPC>();
+    public Queue<ItemStack> lootQueue = new LinkedList<>();
+    private int food_amount_max = -1;
 
 
     @Getter
@@ -114,6 +119,7 @@ public class EzScurriusPlugin extends Plugin {
         overlayManager.add(overlay);
         timeout = 0;
         prayChanged = true;
+
     }
 
     @Override
@@ -121,6 +127,88 @@ public class EzScurriusPlugin extends Plugin {
         keyManager.unregisterKeyListener(toggle);
         overlayManager.remove(overlay);
         timeout = 0;
+    }
+
+    private void LootGroundItems() {
+        Optional<ETileItem> target = Optional.empty();
+        for (String itemName : EzHelperClass.CommaSeperatedStringToList(config.lootableItems())) {
+            Optional<ETileItem> targetHolder = TileItems.search().matchesWildCardNoCase(itemName).first();
+            if (targetHolder.isPresent()) {
+                ItemComposition comp = itemManager.getItemComposition(targetHolder.get().getTileItem().getId());
+                if ((comp.isStackable() || comp.getNote() != -1) && (comp.getName().contains("arrow") || comp.getName().contains("bolt"))) {
+                    if (targetHolder.get().getTileItem().getQuantity() > 7) {
+                        target = targetHolder;
+                        break;
+                    }
+                } else if (targetHolder.isPresent()) {
+                    target = targetHolder;
+                    break;
+                }
+            }
+
+        }
+        if(target.isPresent()){
+            //TileObjectInteraction.interact((target.get().getTileItem()), "");
+        }
+    }
+
+    private boolean CheckGroundItems() {
+        Optional<ETileItem> target = Optional.empty();
+        for (String itemName : EzHelperClass.CommaSeperatedStringToList(config.lootableItems())) {
+            Optional<ETileItem> targetHolder = TileItems.search().matchesWildCardNoCase(itemName).first();
+            if (targetHolder.isPresent()) {
+                ItemComposition comp = itemManager.getItemComposition(targetHolder.get().getTileItem().getId());
+                if ((comp.isStackable() || comp.getNote() != -1) && (comp.getName().contains("arrow") || comp.getName().contains("bolt"))) {
+                    if (targetHolder.get().getTileItem().getQuantity() > 7) {
+                        target = targetHolder;
+                        break;
+                    }
+                } else if (targetHolder.isPresent()) {
+                    target = targetHolder;
+                    break;
+                }
+            }
+
+        }
+        return target.isPresent();
+    }
+
+    private void CheckInventory() {
+        List<Widget> rangePot = Inventory.search().matchesWildCardNoCase("Ranging potion*").result();
+        if (rangePot.stream().filter(d -> !Objects.equals(d.getName(), "Ranging potion(4)")).count() > 1) {
+            var potArray = rangePot.stream().filter(d -> !Objects.equals(d.getName(), "Ranging potion(4)")).collect(Collectors.toList());
+            MousePackets.queueClickPacket();
+            WidgetPackets.queueWidgetOnWidget(potArray.get(0), potArray.get(1));
+        }
+        if (Inventory.search().withName("Vial").first().isPresent()) {
+            InventoryInteraction.useItem("Vial", "Drop");
+
+        }
+
+        List<Widget> strPot = Inventory.search().matchesWildCardNoCase("Strength potion*").result();
+        if (strPot.stream().filter(d -> !Objects.equals(d.getName(), "Strength potion(4)")).count() > 1) {
+            var potArray = strPot.stream().filter(d -> !Objects.equals(d.getName(), "Strength potion(4)")).collect(Collectors.toList());
+            MousePackets.queueClickPacket();
+            WidgetPackets.queueWidgetOnWidget(potArray.get(0), potArray.get(1));
+
+        }
+        if (Inventory.search().withName("Vial").first().isPresent()) {
+            InventoryInteraction.useItem("Vial", "Drop");
+            return;
+        }
+
+    }
+
+    @Subscribe
+    public void onNpcLootReceived(NpcLootReceived event) {
+        if (!started) return;
+        Collection<ItemStack> items = event.getItems();
+        items.stream().filter(item -> {
+            return (EzHelperClass.ItemInCSSWildcard(itemManager.getItemComposition(item.getId()).getName(), config.lootableItems()) || (EzHelperClass.ItemInCSSWildcard(itemManager.getItemComposition(item.getId()).getName(), config.Food()) && (food_amount_max > EzInventory.GetFoodCount(config.Food()) || BoostedHitpoints < client.getRealSkillLevel(Skill.HITPOINTS))));
+        }).forEach(it -> {
+            log.info("Adding to lootQueue: " + it.getId());
+            lootQueue.add(it);
+        });
     }
 
     private void togglePrayer() {
@@ -220,14 +308,7 @@ public class EzScurriusPlugin extends Plugin {
 
             projectiles.add(new ezProjectile(projectile.getId(), ezProjectileType.magic, projectile.getEndCycle()));
 
-//
-//            if (mageProjectile == null && rangeProjectile == null && projectileTimer == 0) {
-//                projectileTimer = finalPhase ? 4 : 4;
-//                mageProjectile = projectile;
-//                rangeProjectile = null;
-//
-//
-//            }
+
         }
 
         if (projectile.getId() == RANGED_ATTACK_ID) {
@@ -238,13 +319,7 @@ public class EzScurriusPlugin extends Plugin {
             projectiles.add(new ezProjectile(projectile.getId(), ezProjectileType.ranged, projectile.getEndCycle()));
 
             System.out.println("Ranged end:" + projectile.getEndCycle());
-//            if (rangeProjectile == null && mageProjectile == null && projectileTimer == 0) {
-//
-//                projectileTimer = finalPhase ? 4 : 4;
-//
-//                rangeProjectile = projectile;
-//                mageProjectile = null;
-//            }
+
         }
     }
 
@@ -256,6 +331,9 @@ public class EzScurriusPlugin extends Plugin {
 
         }
 
+        if (food_amount_max == -1) {
+            food_amount_max = EzInventory.GetFoodCount(config.Food());
+        }
 
         System.out.println("Current Game Cycle: " + client.getGameCycle());
 
@@ -264,8 +342,7 @@ public class EzScurriusPlugin extends Plugin {
         spawnChecked = false;
         BoostedHitpoints = client.getBoostedSkillLevel(Skill.HITPOINTS);
 
-//        rocks.forEach((k, v) -> rocks.put(k, v - 1));
-//        rocks.entrySet().removeIf(entry -> entry.getValue() <= 0);
+
         if (started && !IsInScurrius())
             started = false;
 
@@ -274,22 +351,21 @@ public class EzScurriusPlugin extends Plugin {
             return;
         }
 
+        if (EzInventory.AlchFirstItemInCSS(config.alchableItems()) && config.alchLoot()) {
+            setTimeout();
+            return;
+        }
 
+        CheckInventory();
         state = DetermineState();
 
         Optional<NPC> scurrius = NPCs.search().withId(NpcID.SCURRIUS).first();
         scurrius.ifPresent(rat -> {
-//            if (rat.getHealthRatio() < 0)
-//                return;
-//            finalPhase = rat.getHealthRatio() < 30;
-//            Scurr_health = rat.getHealthRatio() * 5;
+
         });
         Optional<NPC> scurrius2 = NPCs.search().withId(NpcID.SCURRIUS_7222).first();
         scurrius2.ifPresent(rat -> {
-//            if (rat.getHealthRatio() < 0)
-//                return;
-//            finalPhase = rat.getHealthRatio() < 30;
-//            Scurr_health = rat.getHealthRatio() * 5;
+
         });
         Optional<NPC> scurriusBaby = NPCs.search().withName("Giant rat").first();
         if (scurrius.isPresent() || scurrius2.isPresent() || scurriusBaby.isPresent()) {
@@ -317,6 +393,16 @@ public class EzScurriusPlugin extends Plugin {
             return;
         }
 
+        if (state == State.looting) {
+            DoLooting();
+            setTimeout();
+        }
+
+        if (state == State.exiting) {
+            DoExit();
+            setTimeout();
+        }
+
         if (state == State.eating) {
             DoEating();
             setTimeout();
@@ -336,6 +422,10 @@ public class EzScurriusPlugin extends Plugin {
         }
 
 
+    }
+
+    private void DoExit() {
+        TileObjectInteraction.interactNearest("Sewage water", "Quick-escape");
     }
 
     private void DoPrayer() {
@@ -396,6 +486,10 @@ public class EzScurriusPlugin extends Plugin {
 
     }
 
+    private void DoLooting() {
+        ezLooter.LootNearestItemInQueue(lootQueue, false, "", config.Food());
+    }
+
     private void DoBabyKilling() {
         Optional<NPC> scurrius = Optional.empty();
 
@@ -419,6 +513,7 @@ public class EzScurriusPlugin extends Plugin {
 
         Player play = client.getLocalPlayer();
 
+
         if (play.isInteracting() && state == State.killing)
             return;
 
@@ -436,13 +531,9 @@ public class EzScurriusPlugin extends Plugin {
     private State DetermineState() {
         State oRet = State.idle;
 
-        if (client.getBoostedSkillLevel(Skill.PRAYER) < 1) {
+        if (client.getBoostedSkillLevel(Skill.PRAYER) < 1 || EzInventory.GetFoodCount(config.Food()) == 0) {
             return State.exiting;
         }
-
-        if (BoostedHitpoints <= config.eatAt())
-            return State.eating;
-
 
         if (rocksCount > 0) {
             rocks.forEach((k, v) -> rocks.put(k, v - 1));
@@ -458,6 +549,14 @@ public class EzScurriusPlugin extends Plugin {
 
         }
 
+        if (BoostedHitpoints <= config.eatAt())
+            return State.eating;
+
+        if ((Inventory.full() && EzInventory.GetFoodCount(config.Food()) >= 1) || (EzInventory.GetFoodCount(config.Food()) > food_amount_max) && BoostedHitpoints < client.getRealSkillLevel(Skill.HITPOINTS)) {
+            return State.eating;
+        }
+
+
         Optional<NPC> scurrius = NPCs.search().withName("Giant rat").alive().first();
         if (scurrius.isEmpty())
             scurrius = NPCs.search().withId(NpcID.SCURRIUS).first();
@@ -469,38 +568,43 @@ public class EzScurriusPlugin extends Plugin {
             return State.killing;
         }
 
+        if (!lootQueue.isEmpty() && !Inventory.full())
+            return State.looting;
+//        if (CheckGroundItems() && !Inventory.full())
+//            return State.looting;
 
         return oRet;
     }
 
     private void DoEating() {
-        InventoryInteraction.useItem(config.Food().toString(), "Eat");
+        //InventoryInteraction.useItem(config.Food().toString(), "Eat");
+        EzInventory.EatFirstFoodInCSS(config.Food());
         setTimeout();
     }
 
-    public List<String> getLootableItems() {
-        List<String> itemNames = new ArrayList<>();
-        for (String s : config.lootableItems().split(",")) {
-            if (StringUtils.isNumeric(s)) {
-                itemNames.add(Text.removeTags(itemManager.getItemComposition(Integer.parseInt(s)).getName()));
-            } else {
-                itemNames.add(s);
-            }
-        }
-        return itemNames;
-    }
-
-    public List<String> getAlchableItems() {
-        List<String> itemNames = new ArrayList<>();
-        for (String s : config.alchableItems().split(",")) {
-            if (StringUtils.isNumeric(s)) {
-                itemNames.add(Text.removeTags(itemManager.getItemComposition(Integer.parseInt(s)).getName()));
-            } else {
-                itemNames.add(s);
-            }
-        }
-        return itemNames;
-    }
+//    public List<String> getLootableItems() {
+//        List<String> itemNames = new ArrayList<>();
+//        for (String s : config.lootableItems().split(",")) {
+//            if (StringUtils.isNumeric(s)) {
+//                itemNames.add(Text.removeTags(itemManager.getItemComposition(Integer.parseInt(s)).getName()));
+//            } else {
+//                itemNames.add(s);
+//            }
+//        }
+//        return itemNames;
+//    }
+//
+//    public List<String> getAlchableItems() {
+//        List<String> itemNames = new ArrayList<>();
+//        for (String s : config.alchableItems().split(",")) {
+//            if (StringUtils.isNumeric(s)) {
+//                itemNames.add(Text.removeTags(itemManager.getItemComposition(Integer.parseInt(s)).getName()));
+//            } else {
+//                itemNames.add(s);
+//            }
+//        }
+//        return itemNames;
+//    }
 
     private final HotkeyListener toggle = new HotkeyListener(() -> config.toggle()) {
         @Override
@@ -527,5 +631,10 @@ public class EzScurriusPlugin extends Plugin {
             return;
         }
         started = !started;
+
+        if (started) {
+            lootQueue = new LinkedList<>();
+            food_amount_max = -1;
+        }
     }
 }

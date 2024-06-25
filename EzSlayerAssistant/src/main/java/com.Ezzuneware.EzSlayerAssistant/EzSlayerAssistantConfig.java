@@ -1,6 +1,7 @@
 package com.Ezzuneware.EzSlayerAssistant;
 
 
+import com.Ezzuneware.EzApi.Combat.EzTeleItem;
 import net.runelite.client.config.*;
 
 @ConfigGroup("EzSlayerAssistantConfig")
@@ -88,7 +89,7 @@ public interface EzSlayerAssistantConfig extends Config {
             position = 1,
             section = slayerSection
     )
-    default Boolean pickupLoot() {
+    default boolean pickupLoot() {
         return true;
     }
 
@@ -110,7 +111,7 @@ public interface EzSlayerAssistantConfig extends Config {
             position = 3,
             section = slayerSection
     )
-    default Boolean alchLoot() {
+    default boolean alchLoot() {
         return true;
     }
 
@@ -123,6 +124,28 @@ public interface EzSlayerAssistantConfig extends Config {
     )
     default String alchableItems() {
         return "";
+    }
+
+    @ConfigItem(
+            keyName = "Food",
+            name = "Food list",
+            description = "List of food to eat. Put prioritised food to the left.Accepts wildcards *. format: shrimp,bread,etc",
+            position = 5,
+            section = slayerSection
+    )
+    default String Food() {
+        return "";
+    }
+
+    @ConfigItem(
+            keyName = "eatAt",
+            name = "Eat threshold",
+            description = "",
+            position = 6,
+            section = slayerSection
+    )
+    default int eatAt() {
+        return 30;
     }
 
     @ConfigSection(
@@ -173,8 +196,8 @@ public interface EzSlayerAssistantConfig extends Config {
             position = 4,
             section = wildySection
     )
-    default teleItem teleItemChosen() {
-        return teleItem.RING_OF_DUELING;
+    default EzTeleItem teleItemChosen() {
+        return EzTeleItem.RING_OF_DUELING;
     }
 
     @ConfigItem(
@@ -188,11 +211,12 @@ public interface EzSlayerAssistantConfig extends Config {
         return "";
     }
 
+
     @ConfigItem(
             keyName = "scaryItems",
             name = "Scary Items to check for",
             description = "Items to look for when checking for scary items. If one of these is found we'll tele even if they're not skulled. These items we will tele/log on on sight.Values are a comma seperated list of ids or names, including wildcards, e.g 513,rune " + "pickaxe,dragon*",
-            position = 5,
+            position = 6,
             section = wildySection
     )
     default String scaryItems() {
@@ -203,11 +227,22 @@ public interface EzSlayerAssistantConfig extends Config {
             keyName = "pkerMaxDistance",
             name = "Max Distance to Player",
             description = "Adds a distance check when checking for players. If set to -1 will consider any player visible.",
-            position = 6,
+            position = 7,
             section = wildySection
     )
-    default Integer pkerMaxDistance() {
+    default int pkerMaxDistance() {
         return -1;
+    }
+
+    @ConfigItem(
+            keyName = "lootingBagManip",
+            name = "Closes bag to pick up loot that is alchable. Reopens afterwards.",
+            description = "",
+            position = 8,
+            section = slayerSection
+    )
+    default boolean lootingBagManip() {
+        return false;
     }
 
 

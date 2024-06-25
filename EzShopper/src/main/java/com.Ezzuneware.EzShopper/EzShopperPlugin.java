@@ -1,11 +1,9 @@
 package com.Ezzuneware.EzShopper;
 
 
-import com.example.EthanApiPlugin.Collections.Inventory;
-import com.example.EthanApiPlugin.Collections.NPCs;
-import com.example.EthanApiPlugin.Collections.Shop;
-import com.example.EthanApiPlugin.Collections.ShopInventory;
+import com.example.EthanApiPlugin.Collections.*;
 import com.example.EthanApiPlugin.EthanApiPlugin;
+import com.example.InteractionApi.InventoryInteraction;
 import com.example.InteractionApi.NPCInteraction;
 import com.example.InteractionApi.ShopInteraction;
 import com.example.InteractionApi.ShopInventoryInteraction;
@@ -256,10 +254,38 @@ public class EzShopperPlugin extends Plugin {
         }
     }
 
+    private void handleUsing() {
+        if (Widgets.search().withId(WidgetID.SHOP_INVENTORY_GROUP_ID).first().isPresent()) {
+            client.runScript(29);
+            setTimeout();
+            return;
+        }
+        Optional<Widget> item1 = Inventory.search().matchesWildCardNoCase(config.itemToExchange()).first();
+        Optional<Widget> item2 = Inventory.search().matchesWildCardNoCase(config.useOnItemName()).first();
+        if (item1.isPresent() && item2.isPresent()) {
+            MousePackets.queueClickPacket();
+            WidgetPackets.queueWidgetOnWidget(item1.get(), item2.get());
+            setTimeout();
+            return;
+        } else {
+            client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", "", null);
+            state = State.idle;
+        }
+
+    }
+
     private void handleShopping() {
 
 
         if (config.buySell() == buysell.buying) {
+
+            if (Inventory.full()) {
+                if (config.useOnItem()) {
+                    client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", "Invent full, using item on -> " + config.useOnItemName(), null);
+                    state = State.using;
+                    return;
+                }
+            }
             int localItems = Inventory.getItemAmount(config.itemToExchange());
 
             List<Widget> itemsd = Shop.search().matchesWildCardNoCase(config.itemToExchange()).result();//
@@ -291,6 +317,12 @@ public class EzShopperPlugin extends Plugin {
             if (quantityStock > config.quantityToTradeTill()) {
                 int purchaseQuant = quantityStock - config.quantityToTradeTill();
                 if (purchaseQuant >= 50) {
+                    if (config.spamMode()) {
+                        for (int i = 0; i < (RandomUtils.nextInt(3, 6)); i++) {
+                            ShopInteraction.buyFifty(itemToEvaluate);
+                        }
+                        return;
+                    }
                     ShopInteraction.buyFifty(itemToEvaluate);
                     return;
                 }
@@ -327,12 +359,6 @@ public class EzShopperPlugin extends Plugin {
             Optional<Widget> itemToEvaluateTest = ShopInventory.search().first();
 
 
-
-
-
-
-
-
 //            if(itemToEvaluate.isEmpty()){
 //                started = false;
 //                client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", "OUTTA SHITE",null);
@@ -343,22 +369,27 @@ public class EzShopperPlugin extends Plugin {
             itemsd.stream().findFirst().ifPresent(d -> quantityStock[0] = d.getItemQuantity());
 
 
-
             if (quantityStock[0] < config.quantityToTradeTill()) {
                 int sellQuant = config.quantityToTradeTill() - quantityStock[0];
                 if (sellQuant >= 50) {
-                     ShopInventoryInteraction.useItem(itemToEvaluate.get().getName(), "Sell 50");
+                    if (config.spamMode()) {
+                        for (int i = 0; i < (RandomUtils.nextInt(3, 6)); i++) {
+                            ShopInventoryInteraction.useItem(itemToEvaluate.get().getName(), "Sell 50");
+                        }
+                        return;
+                    }
+                    ShopInventoryInteraction.useItem(itemToEvaluate.get().getName(), "Sell 50");
                     return;
                 }
                 if (sellQuant >= 10) {
-                     ShopInventoryInteraction.useItem(itemToEvaluate.get().getName(), "Sell 10");
+                    ShopInventoryInteraction.useItem(itemToEvaluate.get().getName(), "Sell 10");
                     return;
                 }
                 if (sellQuant >= 5) {
-                     ShopInventoryInteraction.useItem(itemToEvaluate.get().getName(), "Sell 5");
+                    ShopInventoryInteraction.useItem(itemToEvaluate.get().getName(), "Sell 5");
                     return;
                 }
-                for(int i = 0; i < sellQuant; i++){
+                for (int i = 0; i < sellQuant; i++) {
                     ShopInventoryInteraction.useItem(itemToEvaluate.get().getName(), "Sell 1");
                 }
 
@@ -389,6 +420,10 @@ public class EzShopperPlugin extends Plugin {
             return;
         }
 
+        if (state == State.using) {
+            handleUsing();
+            return;
+        }
 
         if (state == State.shopping) {
             handleShopping();

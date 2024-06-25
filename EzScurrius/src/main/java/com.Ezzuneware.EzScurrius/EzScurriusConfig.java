@@ -84,8 +84,8 @@ public interface EzScurriusConfig extends Config {
 
     @ConfigItem(
             keyName = "Food",
-            name = "Food name",
-            description = "",
+            name = "Food list",
+            description = "List of food to eat. Put prioritised food to the left.Accepts wildcards *. format: shrimp,bread,etc",
             position = 1,
             section = combatSection
     )
@@ -96,7 +96,7 @@ public interface EzScurriusConfig extends Config {
     @ConfigItem(
             keyName = "lootableItems",
             name = "Lootable items",
-            description = "Values are a comma seperated list of ids or names, including wildcards, e.g 513,rune " + "pickaxe,dragon*",
+            description = "Values are a comma seperated list of ids or names, including wildcards, e.g *arrow,Rune pickaxe,dragon*",
             position = 2,
             section = combatSection
     )
@@ -111,20 +111,10 @@ public interface EzScurriusConfig extends Config {
             position = 3,
             section = combatSection
     )
-    default Boolean alchLoot() {
+    default boolean alchLoot() {
         return true;
     }
 
-    @ConfigItem(
-            keyName = "dodgeRocks",
-            name = "Dodge rocks.",
-            description = "Use at your own peril if using melee. Designed to be used with Range/mage.",
-            position = 4,
-            section = combatSection
-    )
-    default Boolean dodgeRocks() {
-        return true;
-    }
 
     @ConfigItem(
             keyName = "onetapBabies",
@@ -133,7 +123,7 @@ public interface EzScurriusConfig extends Config {
             position = 5,
             section = combatSection
     )
-    default Boolean onetapBabies() {
+    default boolean onetapBabies() {
         return true;
     }
 

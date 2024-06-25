@@ -80,4 +80,5 @@ include 'EzPitfallHunter'
 include 'EzMoonlightMothCollector'
 include 'EzSlayerAssistant'
 include 'EzScurrius'
+include 'EzApi'
 

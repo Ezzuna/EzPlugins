@@ -108,6 +108,7 @@ dependencies {
     implementation project(path: ':EzMoonlightMothCollector')
     implementation project(path: ':EzSlayerAssistant')
     implementation project(path: ':EzScurrius')
+    implementation project(path: ':EzApi')
     implementation 'io.reactivex.rxjava3:rxjava:3.1.6'
 }
 
