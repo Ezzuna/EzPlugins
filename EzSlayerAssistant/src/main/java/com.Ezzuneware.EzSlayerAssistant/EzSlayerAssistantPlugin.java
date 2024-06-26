@@ -140,7 +140,7 @@ public class EzSlayerAssistantPlugin extends Plugin {
 
         if (!started)
             return;
-        if (food_amount_max == -1) {
+        if (food_amount_max <= 0) {
             food_amount_max = EzInventory.GetFoodCount(config.Food());
         }
         if (EzInventory.AlchFirstItemInCSS(config.alchableItems()) && config.alchLoot()) {
@@ -284,36 +284,35 @@ public class EzSlayerAssistantPlugin extends Plugin {
             if (player.getCombatLevel() >= lowRange && player.getCombatLevel() <= highRange) {
                 boolean hadMage = false;
                 boolean skippableWeapon = false;
-//                				if (config.mageFilter())
-//                				{
-//                					int mageBonus = 0;
-//                					for (int equipmentId : player.getPlayerComposition().getEquipmentIds())
-//                					{
-//                						if (equipmentId == -1)
-//                						{
-//                							continue;
-//                						}
-//                						if (equipmentId == 6512)
-//                						{
-//                							continue;
-//                						}
-//                						if (equipmentId >= 512)
-//                						{
-//                							return;
-//                						}
-//                						int realId = equipmentId - 512;
-//                						ItemEquipmentStats itemStats = itemManager.getItemStats(realId, false).getEquipment();
-//                						if (itemStats == null)
-//                						{
-//                							continue;
-//                						}
-//                						mageBonus += itemStats.getAmagic();
-//                					}
-//                					if (mageBonus > 0)
-//                					{
-//                						hadMage = true;
-//                					}
-//                				}
+
+                if (!player.isInteracting() && player.getInteracting() == client.getLocalPlayer()) {
+                    ExecuteTele(player);
+                    continue;
+                }
+
+                int mageBonus = 0;
+                for (int equipmentId : player.getPlayerComposition().getEquipmentIds()) {
+                    if (equipmentId == -1) {
+                        continue;
+                    }
+                    if (equipmentId == 6512) {
+                        continue;
+                    }
+                    if (equipmentId >= 512) {
+                        return;
+                    }
+                    int realId = equipmentId - 512;
+                    ItemEquipmentStats itemStats = itemManager.getItemStats(realId, false).getEquipment();
+                    if (itemStats == null) {
+                        continue;
+                    }
+                    mageBonus += itemStats.getAmagic();
+                }
+                if (mageBonus > 0) {
+                    hadMage = true;
+                }
+
+
                 if (!config.weaponFilter().equals("")) {
                     List<String> filteredWeapons = getFilteredWeapons();
                     for (int equipment : player.getPlayerComposition().getEquipmentIds()) {
@@ -332,26 +331,32 @@ public class EzSlayerAssistantPlugin extends Plugin {
                         continue;
                     }
                 }
+
+
                 boolean teleported = false;
-                if (config.attemptToLogOnPlayer()) {
-                    if (EzPlayerManagement.attempt_logout()) {
-                        client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", "Attempted to log out. If successful will still attempt tele logic as fallback.", null);
-                    }
-                }
-
-
-                if (EzInventory.DoTeleFromTeleItem(config.teleItemChosen())) {
-                    teleportedFromSkulledPlayer = EthanApiPlugin.getSkullIcon(player) != null;
-                    if (teleportedFromSkulledPlayer) {
-                        client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", "Teleported from skulled player", null);
-                    } else {
-                        client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", "Teleported from non-skulled player", null);
-                    }
-                } else {
-                    client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", "Something went wrong teleing from player", null);
-                }
+                ExecuteTele(player);
 
                 return;
+            }
+        }
+    }
+
+    private void ExecuteTele(Player player) {
+        if (config.attemptToLogOnPlayer()) {
+            if (EzPlayerManagement.attempt_logout()) {
+                client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", "Attempted to log out. If successful will still attempt tele logic as fallback.", null);
+            }
+        }
+        if (config.attemptToTeleOnPlayer()) {
+            if (EzInventory.DoTeleFromTeleItem(config.teleItemChosen())) {
+                teleportedFromSkulledPlayer = EthanApiPlugin.getSkullIcon(player) != null;
+                if (teleportedFromSkulledPlayer) {
+                    client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", "Teleported from skulled player", null);
+                } else {
+                    client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", "Teleported from non-skulled player", null);
+                }
+            } else {
+                client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", "Something went wrong teleing from player", null);
             }
         }
     }
