@@ -14,8 +14,8 @@ allprojects {
         jcenter()
     }
 
-    def runeLiteVersion = '1.10.34-SNAPSHOT'
-    //    def runeLiteVersion = 'latest.release'
+    //def runeLiteVersion = '1.10.34-SNAPSHOT'
+        def runeLiteVersion = 'latest.release'
     plugins.withType(JavaPlugin) {
         dependencies {
             compileOnly 'org.projectlombok:lombok:1.18.20'
@@ -31,10 +31,8 @@ allprojects {
 dependencies {
     implementation project(path: ':AutoTitheFarm')
     implementation project(path: ':AutoAerial')
-    implementation project(path: ":AutoRuneDragons")
     implementation project(path: ':AutoBoner')
     implementation project(path: ':AutoChompy')
-    implementation project(path: ':AutoCombat')
     implementation project(path: ':AutoTrapper')
     implementation project(path: ':AutoSmith')
     implementation project(path: ':ButterflyCatcher')
@@ -108,8 +106,6 @@ dependencies {
     implementation project(path: ':EzStall_stealer')
     implementation project(path: ':EzStarReminer')
     implementation project(path: ':EzWintertodt')
-    implementation project(path: ':PiggyAutoCombat')
-    implementation project(path: ':CannonReloader')
     implementation 'io.reactivex.rxjava3:rxjava:3.1.6'
 }
 

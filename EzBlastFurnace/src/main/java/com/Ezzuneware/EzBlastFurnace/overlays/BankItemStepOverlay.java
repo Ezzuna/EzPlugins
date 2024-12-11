@@ -1,0 +1,93 @@
+package com.Ezzuneware.EzBlastFurnace.overlays;
+
+import com.Ezzuneware.EzBlastFurnace.EasyBlastFurnaceConfig;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import com.Ezzuneware.EzBlastFurnace.config.HighlightOverlayTextSetting;
+import com.Ezzuneware.EzBlastFurnace.config.ItemOverlaySetting;
+import com.Ezzuneware.EzBlastFurnace.steps.BankItemStep;
+import com.Ezzuneware.EzBlastFurnace.steps.MethodStep;
+import com.Ezzuneware.EzBlastFurnace.utils.MethodHandler;
+import net.runelite.api.Client;
+import net.runelite.api.widgets.WidgetItem;
+import net.runelite.client.game.ItemManager;
+import net.runelite.client.ui.overlay.WidgetItemOverlay;
+import net.runelite.client.ui.overlay.components.ImageComponent;
+import net.runelite.client.ui.overlay.components.TextComponent;
+
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.util.Arrays;
+
+@Singleton
+public class BankItemStepOverlay extends WidgetItemOverlay
+{
+    @Inject
+    Client client;
+
+    @Inject
+    private ItemManager itemManager;
+
+    @Inject
+    private EasyBlastFurnaceConfig config;
+
+    @Inject
+    private MethodHandler methodHandler;
+
+    BankItemStepOverlay()
+    {
+        showOnBank();
+    }
+
+    @Override
+    public void renderItemOverlay(Graphics2D graphics, int itemId, WidgetItem widgetItem)
+    {
+        if (config.itemOverlayMode() == ItemOverlaySetting.NONE) return;
+
+        MethodStep[] steps = methodHandler.getSteps();
+        if (steps == null) return;
+
+        for (MethodStep step : steps) {
+            if (!(step instanceof BankItemStep)) continue;
+            if (Arrays.stream(((BankItemStep) step).getItemIds()).noneMatch(id -> id == itemId)) continue;
+
+            Color color = config.itemOverlayColor();
+
+            Rectangle bounds = widgetItem.getCanvasBounds();
+
+            if (config.itemOverlayMode() == ItemOverlaySetting.OUTLINE) {
+                BufferedImage outline = itemManager.getItemOutline(itemId, widgetItem.getQuantity(), color);
+                ImageComponent imageComponent = new ImageComponent(outline);
+                imageComponent.setPreferredLocation(new Point(bounds.x, bounds.y));
+                imageComponent.render(graphics);
+            } else {
+                graphics.setColor(color);
+                graphics.draw(bounds);
+            }
+
+            if (config.itemOverlayTextMode() == HighlightOverlayTextSetting.NONE) continue;
+
+            TextComponent textComponent = new TextComponent();
+            textComponent.setColor(color);
+            textComponent.setText(step.getTooltip());
+
+            FontMetrics fontMetrics = graphics.getFontMetrics();
+            int textWidth = fontMetrics.stringWidth(step.getTooltip());
+            int textHeight = fontMetrics.getHeight();
+
+            if (config.itemOverlayTextMode() == HighlightOverlayTextSetting.BELOW) {
+                textComponent.setPosition(new Point(
+                        bounds.x + bounds.width / 2 - textWidth / 2,
+                        bounds.y + bounds.height + textHeight
+                ));
+            } else {
+                textComponent.setPosition(new Point(
+                        bounds.x + bounds.width / 2 - textWidth / 2,
+                        bounds.y - textHeight / 2
+                ));
+            }
+
+            textComponent.render(graphics);
+        }
+    }
+}

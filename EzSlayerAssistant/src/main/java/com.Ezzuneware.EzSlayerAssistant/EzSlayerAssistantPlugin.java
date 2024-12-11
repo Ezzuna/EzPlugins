@@ -349,12 +349,12 @@ public class EzSlayerAssistantPlugin extends Plugin {
         }
         if (config.attemptToTeleOnPlayer()) {
             if (EzInventory.DoTeleFromTeleItem(config.teleItemChosen())) {
-                teleportedFromSkulledPlayer = EthanApiPlugin.getSkullIcon(player) != null;
+                /*teleportedFromSkulledPlayer = EthanApiPlugin.getSkullIcon(player) != null;
                 if (teleportedFromSkulledPlayer) {
                     client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", "Teleported from skulled player", null);
                 } else {
                     client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", "Teleported from non-skulled player", null);
-                }
+                }*/
             } else {
                 client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", "Something went wrong teleing from player", null);
             }

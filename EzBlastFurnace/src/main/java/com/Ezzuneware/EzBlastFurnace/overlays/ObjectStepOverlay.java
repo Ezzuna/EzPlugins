@@ -1,0 +1,89 @@
+package com.Ezzuneware.EzBlastFurnace.overlays;
+
+
+import com.Ezzuneware.EzBlastFurnace.EasyBlastFurnaceConfig;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import com.Ezzuneware.EzBlastFurnace.config.HighlightOverlayTextSetting;
+import com.Ezzuneware.EzBlastFurnace.steps.MethodStep;
+import com.Ezzuneware.EzBlastFurnace.steps.ObjectStep;
+import com.Ezzuneware.EzBlastFurnace.utils.MethodHandler;
+import com.Ezzuneware.EzBlastFurnace.utils.ObjectManager;
+import net.runelite.api.GameObject;
+import net.runelite.client.ui.overlay.Overlay;
+import net.runelite.client.ui.overlay.OverlayPosition;
+import net.runelite.client.ui.overlay.components.TextComponent;
+
+import java.awt.*;
+
+@Singleton
+public class ObjectStepOverlay extends Overlay
+{
+    @Inject
+    private ObjectManager objectManager;
+
+    @Inject
+    private EasyBlastFurnaceConfig config;
+
+    @Inject
+    private MethodHandler methodHandler;
+
+    ObjectStepOverlay()
+    {
+        setPosition(OverlayPosition.DYNAMIC);
+    }
+
+    @Override
+    public Dimension render(Graphics2D graphics)
+    {
+        if (!config.showObjectOverlays()) return null;
+
+        MethodStep[] steps = methodHandler.getSteps();
+
+        if (steps == null) return null;
+
+        for (MethodStep step : steps) {
+            if (!(step instanceof ObjectStep)) continue;
+
+            Color color = config.objectOverlayColor();
+
+            GameObject object = objectManager.get(((ObjectStep) step).getObjectId());
+            Shape clickBox = object.getClickbox();
+
+            if (clickBox == null) continue;
+
+            graphics.setColor(color);
+            graphics.draw(clickBox);
+            graphics.setColor(new Color(color.getRed(), color.getBlue(), color.getGreen(), 20));
+            graphics.fill(clickBox);
+
+            if (config.objectOverlayTextMode() == HighlightOverlayTextSetting.NONE) continue;
+
+            TextComponent textComponent = new TextComponent();
+            Rectangle bounds = object.getClickbox().getBounds();
+
+            FontMetrics fontMetrics = graphics.getFontMetrics();
+            int textWidth = fontMetrics.stringWidth(step.getTooltip());
+            int textHeight = fontMetrics.getHeight();
+
+            if (config.objectOverlayTextMode() == HighlightOverlayTextSetting.ABOVE) {
+                textComponent.setPosition(new Point(
+                        bounds.x + bounds.width / 2 - textWidth / 2,
+                        bounds.y - textHeight
+                ));
+            } else {
+                textComponent.setPosition(new Point(
+                        bounds.x + bounds.width / 2 - textWidth / 2,
+                        bounds.y + bounds.height
+                ));
+            }
+
+            textComponent.setColor(color);
+            textComponent.setText(step.getTooltip());
+
+            textComponent.render(graphics);
+        }
+
+        return null;
+    }
+}

@@ -12,6 +12,7 @@ import com.example.Packets.MousePackets;
 import com.example.Packets.WidgetPackets;
 import com.google.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
+import net.runelite.api.Client;
 import net.runelite.api.Item;
 import net.runelite.api.ItemComposition;
 import net.runelite.api.TileItem;
@@ -26,13 +27,14 @@ import java.util.Queue;
 import java.util.Scanner;
 import java.util.regex.Pattern;
 
-import static com.example.PacketUtils.PacketReflection.client;
+
 
 @Slf4j
 public class ezLooter {
     @Inject
     EzApi ezApi;
     static ItemManager itemManager = RuneLite.getInjector().getInstance(ItemManager.class);
+    static Client client = RuneLite.getInjector().getInstance(Client.class);
 
     public static boolean GetLootIsInLootList(ItemStack item, String css) {
 

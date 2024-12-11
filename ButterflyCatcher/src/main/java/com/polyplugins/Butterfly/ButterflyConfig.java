@@ -34,5 +34,7 @@ public interface ButterflyConfig extends Config {
     default int tickDelay() {
         return 0;
     }
+
+
 }
 

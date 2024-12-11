@@ -140,7 +140,7 @@ public class EzSplasherPlugin extends Plugin {
             if (npcName.equals("chicken")) {
                 if (menuEntryAdded.getMenuEntry().getNpc().getAnimation() == 838) {
                     me.setOption("Splash")
-                            .setType(MenuAction.RUNELITE_SUBMENU)
+                            .setType(MenuAction.RUNELITE)
                             .onClick(e -> {
                                 currentTarget = targetNpc;
                                 AttackTarget();

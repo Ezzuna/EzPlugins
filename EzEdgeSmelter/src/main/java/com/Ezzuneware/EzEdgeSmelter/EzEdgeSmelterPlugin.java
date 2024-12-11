@@ -174,8 +174,8 @@ public class EzEdgeSmelterPlugin extends Plugin {
             taskManager.addTask(new OpenBank(this, config));
             taskManager.addTask(new Banking(this, config));
             taskManager.addTask(new OpenFurnace(this, config));
-            taskManager.addTask(new DoSmithing(this, config));
-            taskManager.addTask(new DoCrafting(this, config));
+            taskManager.addTask(new DoSmithing(this, config, client));
+            taskManager.addTask(new DoCrafting(this, config, client));
         } else {
             taskManager.clearTasks();
         }

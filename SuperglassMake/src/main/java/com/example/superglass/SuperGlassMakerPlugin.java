@@ -28,6 +28,7 @@ import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDependency;
 import net.runelite.client.plugins.PluginDescriptor;
+import org.apache.commons.lang3.RandomUtils;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Optional;
@@ -70,9 +71,11 @@ public class SuperGlassMakerPlugin extends Plugin {
         if (client.getWidget(WidgetInfo.BANK_CONTAINER) == null) {
             if (banker.isPresent()) {
                 NPCInteraction.interact(banker.get(), "Bank");
+                setTimeout();
                 return;
             } else if (bank.isPresent()) {
                 TileObjectInteraction.interact(bank.get(), "Bank");
+                setTimeout();
                 return;
             } else {
                 client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", "couldn't find bank or banker", null);
@@ -104,8 +107,10 @@ public class SuperGlassMakerPlugin extends Plugin {
             } else {
                 if (banker.isPresent()) {
                     NPCInteraction.interact(banker.get(), "Bank");
+                    setTimeout();
                 } else if (bank.isPresent()) {
                     TileObjectInteraction.interact(bank.get(), "Bank");
+                    setTimeout();
                 } else {
                     client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", "couldn't find bank or banker", null);
                     EthanApiPlugin.stopPlugin(this);
@@ -130,8 +135,10 @@ public class SuperGlassMakerPlugin extends Plugin {
         }
         if (banker.isPresent()) {
             NPCInteraction.interact(banker.get(), "Bank");
+            setTimeout();
         } else if (bank.isPresent()) {
             TileObjectInteraction.interact(bank.get(), "Bank");
+            setTimeout();
         } else {
             client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", "couldn't find bank or banker try 2", null);
             EthanApiPlugin.stopPlugin(this);
@@ -161,6 +168,10 @@ public class SuperGlassMakerPlugin extends Plugin {
 //        WidgetPackets.queueWidgetAction(secondary.get(), "Withdraw-" + config.secondary().getSandAmount());
         BankInteraction.withdrawX(secondary.get(), config.secondary().getSandAmount());
         return true;
+    }
+
+    private void setTimeout() {
+        timeout = RandomUtils.nextInt(1, 3);
     }
 
 

@@ -41,7 +41,6 @@ import com.example.gauntletFlicker.gauntletFlicker;
 import com.example.harpoon2ticker.SwordFish2Tick;
 import com.example.superglass.SuperGlassMakerPlugin;
 import com.piggyplugins.AutoAerial.AutoAerialPlugin;
-import com.piggyplugins.AutoCombatv2.AutoCombatv2Plugin;
 import com.piggyplugins.AutoJugHumidifier.AutoJugHumidifierPlugin;
 import com.piggyplugins.AutoRifts.AutoRiftsPlugin;
 import com.piggyplugins.AutoSmith.AutoSmith;
@@ -55,7 +54,6 @@ import com.piggyplugins.BobTheHunter.BobTheHunterPlugin;
 import com.piggyplugins.BobTheLazyNMZ.BobTheLazyNMZPlugin;
 import com.piggyplugins.BobTheThief.BobTheThiefPlugin;
 import com.piggyplugins.BobTheWizard.BobTheWizardPlugin;
-import com.piggyplugins.CannonReloader.CannonReloaderPlugin;
 import com.piggyplugins.Firemaking.FiremakingPlugin;
 import com.piggyplugins.HerbCleaner.HerbCleanerPlugin;
 import com.piggyplugins.ItemCombiner.ItemCombinerPlugin;
@@ -72,7 +70,6 @@ import com.piggyplugins.SpeedDartMaker.SpeedDartMakerPlugin;
 import com.piggyplugins.VardorvisHelper.VardorvisHelperPlugin;
 import com.piggyplugins.strategyexample.StrategySmithPlugin;
 import com.polyplugins.AutoBoner.AutoBonerPlugin;
-import com.polyplugins.AutoRuneDragon.RuneDragonsPlugin;
 import com.polyplugins.Butterfly.ButterflyPlugin;
 import com.polyplugins.Chompy.AutoChompyPlugin;
 import com.polyplugins.Dialogue.DialogueContinuerPlugin;
@@ -92,10 +89,8 @@ public class PluginTester {
                 StrategySmithPlugin.class, AutoBonerPlugin.class,
                 AutoAerialPlugin.class,
                 AutoChompyPlugin.class,
-                AutoCombatv2Plugin.class,
                 AutoJugHumidifierPlugin.class,
                 AutoRiftsPlugin.class,
-                RuneDragonsPlugin.class,
                 AutoSmith.class,
                 AutoTele.class,
                 AutoTitheFarmPlugin.class,
@@ -114,7 +109,6 @@ public class PluginTester {
                 BobTheWizardPlugin.class,
                 ButterflyPlugin.class,
                 CalvarionHelper.class,
-                CannonReloaderPlugin.class,
                 ChinBreakHandlerPlugin.class,
                 PuzzleBoxSolver.class,
                 DialogueContinuerPlugin.class,

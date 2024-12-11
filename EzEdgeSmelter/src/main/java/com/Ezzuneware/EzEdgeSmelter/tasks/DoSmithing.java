@@ -12,22 +12,25 @@ import com.example.Packets.WidgetPackets;
 import com.piggyplugins.PiggyUtils.strategy.AbstractTask;
 
 import lombok.extern.slf4j.Slf4j;
+import net.runelite.api.Client;
 import net.runelite.api.widgets.Widget;
 
 import java.util.List;
 import java.util.Optional;
 
-import static com.example.PacketUtils.PacketReflection.client;
+
 
 @Slf4j
 public class DoSmithing extends AbstractTask<EzEdgeSmelterPlugin, EzEdgeSmelterConfig> {
 //    @Inject
-//    protected Client client;
+    protected Client client;
 //    @Inject
 //    protected ClientThread clientThread;
 
-    public DoSmithing(EzEdgeSmelterPlugin plugin, EzEdgeSmelterConfig config) {
+    public DoSmithing(EzEdgeSmelterPlugin plugin, EzEdgeSmelterConfig config, Client client) {
         super(plugin, config);
+        this.client = client;
+
     }
 
     @Override

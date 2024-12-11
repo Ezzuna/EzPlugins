@@ -1,0 +1,133 @@
+package com.Ezzuneware.EzBlastFurnace.methods;
+
+import com.Ezzuneware.EzBlastFurnace.state.BlastFurnaceState;
+import com.Ezzuneware.EzBlastFurnace.steps.MethodStep;
+import com.Ezzuneware.EzBlastFurnace.utils.Strings;
+import lombok.extern.slf4j.Slf4j;
+import net.runelite.api.ItemID;
+
+@Slf4j
+public class GoldBarMethod extends Method
+{
+    private MethodStep[] checkPrerequisite(BlastFurnaceState state)
+    {
+        // ensure player has both ice gloves & goldsmith gauntlets either in inventory or equipped
+
+        if (!state.getInventory().has(ItemID.ICE_GLOVES, ItemID.SMITHS_GLOVES_I) && !state.getEquipment().hasIceGlovesEffect()) {
+            return state.getBank().isOpen() ? withdrawIceOrSmithsGloves : openBank;
+        }
+
+        if (state.getBank().has(ItemID.MAX_CAPE) &&
+                !state.getInventory().has(ItemID.MAX_CAPE) &&
+                !state.getEquipment().equipped(ItemID.MAX_CAPE)) {
+            return state.getBank().isOpen() ? withdrawMaxCape : openBank;
+        }
+
+        if (state.getInventory().has(ItemID.MAX_CAPE) &&
+                !state.getEquipment().equipped(ItemID.MAX_CAPE)) {
+            return equipMaxCape;
+        }
+
+        if (state.getBank().has(ItemID.SMITHING_CAPE, ItemID.SMITHING_CAPET) &&
+            !state.getInventory().has(ItemID.SMITHING_CAPE, ItemID.SMITHING_CAPET) &&
+            !state.getEquipment().equipped(ItemID.SMITHING_CAPE, ItemID.SMITHING_CAPET, ItemID.MAX_CAPE)) {
+            return state.getBank().isOpen() ? withdrawSmithingCape : openBank;
+        }
+
+        if (state.getInventory().has(ItemID.SMITHING_CAPE, ItemID.SMITHING_CAPET) &&
+            !state.getEquipment().equipped(ItemID.SMITHING_CAPE, ItemID.SMITHING_CAPET, ItemID.MAX_CAPE)) {
+            return equipSmithingCape;
+        }
+
+        if (!state.getInventory().has(ItemID.GOLDSMITH_GAUNTLETS) && !state.getEquipment().hasGoldsmithEffect()) {
+            return state.getBank().isOpen() ? withdrawGoldsmithGauntlets : openBank;
+        }
+
+        return null;
+    }
+
+    @Override
+    public MethodStep[] next(BlastFurnaceState state)
+    {
+        MethodStep[] prerequisite = checkPrerequisite(state);
+        if (prerequisite != null) return prerequisite;
+        boolean oreOnConveyor = state.getPlayer().hasOreOnConveyor();
+        boolean furnaceHasBar = state.getFurnace().has(ItemID.GOLD_BAR);
+        boolean furnaceHasOre = state.getFurnace().has(ItemID.GOLD_ORE);
+        boolean tickPerfectMethod = state.getConfig().tickPerfectMethod();
+        boolean atBarDispenser = state.getPlayer().isAtBarDispenser();
+        boolean atConveyorBelt = state.getPlayer().isAtConveyorBelt();
+        boolean useDepositInventory = state.getConfig().useDepositInventory();
+
+        if (state.getBank().isOpen()) {
+            if (furnaceHasOre && furnaceHasBar || (!tickPerfectMethod && furnaceHasBar)) {
+                if (state.getInventory().has(ItemID.GOLD_BAR, ItemID.GOLD_ORE)) {
+                    return useDepositInventory ? depositInventory : depositBarsAndOres;
+                }
+                return collectBars;
+            }
+
+            if (state.getInventory().has(ItemID.GOLD_BAR)) {
+                return state.getConfig().useDepositInventory() ? depositInventory : depositBarsAndOres;
+            }
+
+            if (tickPerfectMethod && !state.getEquipment().hasGoldsmithEffect() && !state.getEquipment().hasIceGlovesEffect()) {
+                return equipGoldsmithGauntlets;
+            }
+
+            if (!tickPerfectMethod && !state.getEquipment().hasGoldsmithEffect()) {
+                return equipGoldsmithGauntlets;
+            }
+
+            if (!state.getInventory().has(ItemID.GOLD_ORE)) {
+                return withdrawGoldOre;
+            }
+        }
+
+        if (tickPerfectMethod && state.getInventory().has(ItemID.GOLD_ORE)) {
+            if (furnaceHasBar) {
+                return putOntoConveyorBelt;
+            } else {
+                return putOntoConveyorBeltAndEquipGoldsmithGauntlets;
+            }
+        }
+
+        if (tickPerfectMethod && (oreOnConveyor || furnaceHasOre) && furnaceHasBar) {
+            if (atConveyorBelt) {
+                return goToDispenser;
+            }
+
+            if (!atBarDispenser) {
+                return goToDispenserAndEquipIceOrSmithsGloves;
+            }
+
+            return collectBarsAndEquipGoldsmithGauntlets;
+        }
+
+        if (!tickPerfectMethod && state.getInventory().has(ItemID.GOLD_ORE)) {
+            if (!state.getEquipment().hasGoldsmithEffect()) {
+                return equipGoldsmithGauntlets;
+            }
+            return putOntoConveyorBelt;
+        }
+
+		if (!tickPerfectMethod && (oreOnConveyor || furnaceHasOre)) {
+			return waitForGoldBars;
+		}
+
+        if (!tickPerfectMethod && furnaceHasBar) {
+            if (!state.getEquipment().hasIceGlovesEffect()) {
+                return equipIceOrSmithsGloves;
+            }
+            return collectBars;
+        }
+
+        return openBank;
+    }
+
+    @Override
+    public String getName()
+    {
+        return Strings.GOLD;
+    }
+}

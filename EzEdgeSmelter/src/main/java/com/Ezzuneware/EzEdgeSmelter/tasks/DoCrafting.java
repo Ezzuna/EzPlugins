@@ -15,17 +15,19 @@ import net.runelite.api.widgets.Widget;
 import java.util.List;
 import java.util.Optional;
 
-import static com.example.PacketUtils.PacketReflection.client;
+import net.runelite.api.Client;
 
 @Slf4j
 public class DoCrafting extends AbstractTask<EzEdgeSmelterPlugin, EzEdgeSmelterConfig> {
-//    @Inject
-//    protected Client client;
+
+    protected Client client;
 //    @Inject
 //    protected ClientThread clientThread;
 
-    public DoCrafting(EzEdgeSmelterPlugin plugin, EzEdgeSmelterConfig config) {
+    public DoCrafting(EzEdgeSmelterPlugin plugin, EzEdgeSmelterConfig config, Client client) {
         super(plugin, config);
+        this.client = client;
+
     }
 
     @Override
